@@ -1,0 +1,289 @@
+<html>
+<head>
+</head>
+
+<body onload=init();>
+
+<button type="button" id="playbutton">PLAY</button>
+<p>
+<svg width="100%" height="20%" id="sr" >
+
+<style type="text/css">
+    <![CDATA[
+      #ra {
+        stroke: black;
+        fill: white;
+		y: 10;
+		width: 50;
+		height: 100;
+		rx: 5;
+      }
+    ]]>
+</style>
+  <rect id="ra" name="beat" x="10" />
+  <rect id="ra" name="beat" x="70" />
+  <rect id="ra" name="beat" x="130" />
+  <rect id="ra" name="beat" x="190" />
+  <rect id="ra" name="beat" x="250" />
+  <rect id="ra" name="beat" x="310" />
+  <rect id="ra" name="beat" x="370" />
+  <rect id="ra" name="beat" x="430" />
+  <rect id="ra" name="beat" x="490" />
+  <rect id="ra" name="beat" x="550" />
+  <rect id="ra" name="beat" x="610" />
+  <rect id="ra" name="beat" x="670" />
+</svg>
+<p>
+
+<div>
+</div>
+
+<style>
+table {
+  width: 100%;
+  //border: 1px solid black;
+}
+
+td {
+  padding: 8px;
+  //border: 1px solid black;  
+}
+
+</style>
+
+
+
+<table>
+	<col width="15%">
+	<col width="75%">	
+	<col width="10%">
+	<tr>
+		<td>BPM</td>
+		<td>
+			<div class="slidecontainer">
+			<input type="range" min="30" max="300" value="120" class="slider" id="tempo">
+		</td>
+		<td>
+			<input type="number" id="tempovalue" value="120">
+		</td>
+	</tr>
+	<tr>
+		<td>Clap Vol Hi</td>
+		<td>
+			<div class="slidecontainer">
+			<input type="range" min="1" max="100" value="90" class="slider" id="volhi">
+		</td>
+		<td>
+			<input type="number" id="volhivalue" value="90">
+		</td>
+	</tr>
+	<tr>
+		<td>Clap Vol Lo</td>
+		<td>
+			<div class="slidecontainer">
+			<input type="range" min="1" max="100" value="10" class="slider" id="vollo">
+		</td>
+		<td>
+			<input type="number" id="vollovalue" value="10">
+		</td>
+	</tr>
+	
+</table>
+</div>
+
+<script>
+
+//rts = document.getElementsByTagName("rect");
+rts = document.getElementsByName("beat");
+//play = false;
+//interval = null;
+timerId = null;
+audio = new Audio('clap.mp3');
+tempoSlider = document.getElementById("tempo");
+tempoValue = document.getElementById("tempovalue");
+tempoSlider.oninput = function() {
+  tempoValue.value = this.value;
+//  alert(1000*60/tempoValue);
+//	clearInterval(interval);
+}
+tempoValue.oninput = function() {
+	tempoSlider.value = this.value;
+}
+
+
+//function sleep(ms) {
+//  return new Promise(resolve => setTimeout(resolve, ms));
+//}
+
+function init() {
+	for(var i = 0; i < rts.length; i++) {
+       rts[i].addEventListener("click", toggleAccent(i));
+	   rts[i].addEventListener("dblclick", doubleClick(i));
+
+ }
+}
+
+
+
+ function toggleAccent(i) {
+    return function() {
+        console.log("you clicked rect number " + i);
+		if (rts[i].style.fill == "gray") {
+			rts[i].style.fill = "white";
+			console.log("oli red");
+			}
+		else {
+		rts[i].style.fill = "gray";
+		console.log("oli blue");
+		}
+    };
+ }
+
+function doubleClick(i) {
+    return function() {
+        console.log("you doubleclicked rect number " + i);
+		clearTimeout(timerId);
+		play3Metronome(i);
+    };
+ }
+
+function toggleStroke(i) {
+
+		var p = i - 1;
+
+		if (p < 0) { p = rts.length - 1; }
+		rts[i].style['stroke-width'] = "8px";
+		rts[p].style['stroke-width'] = "1px";
+}
+
+
+function play2Metronome(s) {
+
+console.log(1000 * 60  / tempoValue.value);
+	var i = s;
+	for (var j = 0; j < rts.length; j++) rts[j].style['stroke-width'] = "1px";
+	//rts.foreach (e => e.style['stroke-width'] = "1px");
+	//while (true)  {
+    interval = setInterval(function () {
+        console.log(i);  // this is inside your loop
+		toggleStroke(i);
+		if (rts[i].style.fill == "gray") {
+			//console.log("plays accented");
+			audio.volume = 1.0;
+			audio.play();
+		} else {
+			audio.volume = 0.1;
+			audio.play();
+			//console.log("plays un-accented");
+		}
+		i++;
+		i = i % (rts.length);
+    }, 1000 * 60  / tempoValue.value);
+
+}
+
+
+function play3Metronome(s) {
+
+console.log(1000 * 60  / tempoValue.value);
+	var i = s;
+	for (var j = 0; j < rts.length; j++) rts[j].style['stroke-width'] = "1px";
+
+	timerId = setTimeout(function tick() {
+
+		console.log(i);  // this is inside your loop
+		toggleStroke(i);
+		if (rts[i].style.fill == "gray") {
+			//console.log("plays accented");
+			audio.volume = 1.0;
+			audio.play();
+		} else {
+			audio.volume = 0.1;
+			audio.play();
+			//console.log("plays un-accented");
+		}
+		i++;
+		i = i % (rts.length);
+		timerId = setTimeout(tick, 1000 * 60 / tempoValue.value);
+    }, 1000 * 60  / tempoValue.value);
+
+}
+
+
+function startStop() {
+
+	   console.log(rts);
+//	   return;
+//	console.log("play: " + play);
+	if (timerId == null) {
+//		play = true;
+//		console.log("starting..");
+		play3Metronome(0) ;
+		}
+	else {
+//		play = false;
+		clearTimeout(timerId);
+		timerId = null;
+		}
+}
+
+document.getElementById("playbutton").onclick = function(){startStop();};
+</script>
+
+
+
+<script>
+
+
+</script>
+
+<style>
+
+input[type=number] {
+  width: 40px
+}
+
+.slidecontainer {
+  width: 100%; /* Width of the outside container */
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 15px;
+  border-radius: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+</style>
+
+
+</body>
+</html>
