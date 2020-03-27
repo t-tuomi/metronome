@@ -93,55 +93,58 @@ td {
 
 <script>
 
-//rts = document.getElementsByTagName("rect");
 rts = document.getElementsByName("beat");
-//play = false;
-//interval = null;
 timerId = null;
 audio = new Audio('clap.mp3');
+
 tempoSlider = document.getElementById("tempo");
 tempoValue = document.getElementById("tempovalue");
+volHiSlider = document.getElementById("volhi");
+volHiValue = document.getElementById("volhivalue");
+volLoSlider = document.getElementById("vollo");
+volLoValue = document.getElementById("vollovalue");
+
 tempoSlider.oninput = function() {
   tempoValue.value = this.value;
-//  alert(1000*60/tempoValue);
-//	clearInterval(interval);
 }
 tempoValue.oninput = function() {
 	tempoSlider.value = this.value;
 }
 
+volHiSlider.oninput = function() {
+  volHiValue.value = this.value;
+}
+volHiValue.oninput = function() {
+	volHi.value = this.value;
+}
 
-//function sleep(ms) {
-//  return new Promise(resolve => setTimeout(resolve, ms));
-//}
+volLoSlider.oninput = function() {
+  volLoValue.value = this.value;
+}
+volLoValue.oninput = function() {
+	volLo.value = this.value;
+}
 
 function init() {
 	for(var i = 0; i < rts.length; i++) {
        rts[i].addEventListener("click", toggleAccent(i));
 	   rts[i].addEventListener("dblclick", doubleClick(i));
-
- }
+	}
 }
-
-
 
  function toggleAccent(i) {
     return function() {
-        console.log("you clicked rect number " + i);
 		if (rts[i].style.fill == "gray") {
 			rts[i].style.fill = "white";
-			console.log("oli red");
-			}
+		}
 		else {
 		rts[i].style.fill = "gray";
-		console.log("oli blue");
 		}
     };
  }
 
 function doubleClick(i) {
     return function() {
-        console.log("you doubleclicked rect number " + i);
 		clearTimeout(timerId);
 		play3Metronome(i);
     };
@@ -160,6 +163,7 @@ function toggleStroke(i) {
 function play2Metronome(s) {
 
 console.log(1000 * 60  / tempoValue.value);
+	console.log("EI PITAS TULLA TANNE.......");
 	var i = s;
 	for (var j = 0; j < rts.length; j++) rts[j].style['stroke-width'] = "1px";
 	//rts.foreach (e => e.style['stroke-width'] = "1px");
@@ -182,23 +186,22 @@ console.log(1000 * 60  / tempoValue.value);
 
 }
 
-
+ 
 function play3Metronome(s) {
 
-console.log(1000 * 60  / tempoValue.value);
+	//console.log(1000 * 60  / tempoValue.value);
 	var i = s;
 	for (var j = 0; j < rts.length; j++) rts[j].style['stroke-width'] = "1px";
 
 	timerId = setTimeout(function tick() {
 
-		console.log(i);  // this is inside your loop
 		toggleStroke(i);
 		if (rts[i].style.fill == "gray") {
 			//console.log("plays accented");
-			audio.volume = 1.0;
+			audio.volume = volHiValue.value / 100;
 			audio.play();
 		} else {
-			audio.volume = 0.1;
+			audio.volume = volLoValue.value / 100;
 			audio.play();
 			//console.log("plays un-accented");
 		}
@@ -212,22 +215,19 @@ console.log(1000 * 60  / tempoValue.value);
 
 function startStop() {
 
-	   console.log(rts);
-//	   return;
-//	console.log("play: " + play);
+//	   console.log(rts);
 	if (timerId == null) {
-//		play = true;
-//		console.log("starting..");
 		play3Metronome(0) ;
 		}
 	else {
-//		play = false;
 		clearTimeout(timerId);
 		timerId = null;
 		}
 }
 
 document.getElementById("playbutton").onclick = function(){startStop();};
+document.addEventListener("space", function() { startStop();});
+
 </script>
 
 
